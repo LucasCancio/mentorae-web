@@ -1,4 +1,4 @@
-import { Link, LinkProps, useLocation } from 'react-router-dom';
+import { Link, LinkProps, useLocation } from "react-router";
 
 export type TNavLinkProps = LinkProps;
 

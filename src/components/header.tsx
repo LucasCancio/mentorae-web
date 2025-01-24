@@ -9,10 +9,10 @@ export function Header() {
         <div className="flex gap-2 items-center justify-center text-primary">
           <img
             src="/logo.png"
-            alt="Fiaposts"
+            alt="Mentorae"
             className="h-6 w-6 ml-10 md:ml-0"
           />
-          <h2 className="text-xl font-semibold hidden md:block">Fiaposts</h2>
+          <h2 className="text-xl font-semibold hidden md:block">Mentorae</h2>
         </div>
 
         <Sidebar />

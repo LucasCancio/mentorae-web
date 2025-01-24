@@ -1,6 +1,6 @@
 import { Link, Outlet } from "react-router";
 
-export function AuthLayout() {
+export function PublicLayout() {
   return (
     <div className="grid min-h-screen grid-cols-2 antialiased">
       <div className="flex h-full flex-col justify-between border-r border-foreground/5 bg-muted p-10 text-muted-foreground">
@@ -8,12 +8,12 @@ export function AuthLayout() {
           to="/"
           className="flex items-center gap-3 text-lg font-medium text-foreground"
         >
-          <img src="/logo.png" alt="Fiaposts" className="h-5 w-5" />
-          <span className="font-semibold">Fiaposts</span>
+          <img src="/logo.png" alt="mentorae" className="h-5 w-5" />
+          <span className="font-semibold">mentorae</span>
         </Link>
 
         <footer className="text-sm">
-          Painel do professor &copy; Fiaposts - {new Date().getFullYear()}
+          Painel do professor &copy; mentorae - {new Date().getFullYear()}
         </footer>
       </div>
 

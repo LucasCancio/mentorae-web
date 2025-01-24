@@ -31,7 +31,7 @@ export function SidebarMobile(props: SidebarMobileProps) {
       </SheetTrigger>
       <SheetContent side="left" className="px-3 py-4" hideClose>
         <SheetHeader className="flex flex-row justify-between items-center space-y-0">
-          <SheetTitle className="mx-3">Fiaposts</SheetTitle>
+          <SheetTitle className="mx-3">Mentorae</SheetTitle>
           <SheetClose asChild>
             <Button className="h-7 w-7 p-0" variant="ghost">
               <X size={15} />

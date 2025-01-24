@@ -6,9 +6,8 @@ import { getPostById } from "@/api/posts/get-post-by-id";
 import { ArrowLeft } from "lucide-react";
 import { CategoryList } from "@/components/category-list";
 import AuthorDetails from "@/components/author-details";
-import { ContentMarkdown } from "@/components/content-markdown";
 
-export function Post() {
+export function Mentoring() {
   const { id } = useParams();
 
   const { data: post, isLoading: isLoadingPost } = useQuery({
@@ -52,7 +51,6 @@ export function Post() {
           alt={post.title}
           className="w-full h-96 object-cover"
         />
-        <ContentMarkdown content={post.content} />
       </div>
     </>
   );

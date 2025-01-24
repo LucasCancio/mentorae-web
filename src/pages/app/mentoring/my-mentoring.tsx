@@ -14,7 +14,7 @@ import {
 import { PostTableRow } from "@/components/post-table-row";
 import { getMyPosts } from "@/api/posts/get-my-posts";
 
-export function MyPosts() {
+export function MyMentoring() {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const page = z.coerce.number().parse(searchParams.get("page") ?? "1");

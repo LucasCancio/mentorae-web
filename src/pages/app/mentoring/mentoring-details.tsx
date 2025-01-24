@@ -33,7 +33,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
-import { ContentMarkdown } from "@/components/content-markdown";
 import { TCategory } from "@/api/categories/get-categories";
 
 const postForm = z.object({
@@ -59,7 +58,7 @@ const postForm = z.object({
 
 type TPostForm = z.infer<typeof postForm>;
 
-export function PostDetails() {
+export function MentoringDetails() {
   const { id: idParam } = useParams();
   const postId = z.coerce.number().optional().parse(idParam);
   const isEdditing = Boolean(postId);
@@ -321,7 +320,7 @@ export function PostDetails() {
                       <Type className="size-4 mr-2" /> Prévia do conteúdo
                     </Button>
                   </DialogTrigger>
-                  <PostContentPreviewDialog content={content} />
+                  <PostContentPreviewDialog />
                 </Dialog>
               </div>
               <Textarea
@@ -359,11 +358,7 @@ export function PostDetails() {
   );
 }
 
-type PostContentPreviewDialogProps = {
-  content: string;
-};
-
-function PostContentPreviewDialog({ content }: PostContentPreviewDialogProps) {
+function PostContentPreviewDialog() {
   return (
     <DialogContent>
       <DialogHeader>
@@ -373,7 +368,6 @@ function PostContentPreviewDialog({ content }: PostContentPreviewDialogProps) {
         </DialogDescription>
       </DialogHeader>
       <Separator />
-      <ContentMarkdown content={content} />
     </DialogContent>
   );
 }

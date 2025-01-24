@@ -1,30 +1,32 @@
-import { AppLayout } from "./pages/_layouts/app";
-import { AuthLayout } from "./pages/_layouts/auth";
+import { AuthenticatedLayout } from "./pages/_layouts/authenticated";
+import { PublicLayout } from "./pages/_layouts/public";
 import { NotFound } from "./pages/404";
-import { Posts } from "./pages/app/posts/posts";
+import { MentoringList } from "./pages/app/mentoring/mentoring-list";
 import { SignIn } from "./pages/app/auth/sign-in";
 import { SignUp } from "./pages/app/auth/sign-up";
 import { Error } from "./pages/error";
-import { PostDetails } from "./pages/app/posts/post-details";
-import { Post } from "./pages/app/posts/post";
-import { MyPosts } from "./pages/app/posts/my-posts";
+import { MentoringDetails } from "./pages/app/mentoring/mentoring-details";
+import { Mentoring } from "./pages/app/mentoring/mentoring";
+import { MyMentoring } from "./pages/app/mentoring/my-mentoring";
 import { createBrowserRouter } from "react-router";
+import { Jobs } from "./pages/app/jobs/jobs";
 
 export const router = createBrowserRouter([
   {
     path: "/",
-    element: <AppLayout />,
+    element: <AuthenticatedLayout />,
     errorElement: <Error />,
     children: [
-      { path: "/", element: <Posts /> },
-      { path: "/post-details/:id?", element: <PostDetails /> },
-      { path: "/post/:id/:slug", element: <Post /> },
-      { path: "/my-posts", element: <MyPosts /> },
+      { path: "/", element: <MentoringList /> },
+      { path: "/mentoring/details/:id?", element: <MentoringDetails /> },
+      { path: "/mentoring/:id", element: <Mentoring /> },
+      { path: "/my-mentoring", element: <MyMentoring /> },
+      { path: "/jobs", element: <Jobs /> },
     ],
   },
   {
     path: "/",
-    element: <AuthLayout />,
+    element: <PublicLayout />,
     children: [
       { path: "/sign-in", element: <SignIn /> },
       { path: "/sign-up", element: <SignUp /> },

@@ -4,11 +4,11 @@ import { useSearchParams } from "react-router";
 import { z } from "zod";
 
 import { getPosts } from "@/api/posts/get-posts";
-import { PostFilters } from "./post-filters";
+import { MentoringFilters } from "./mentoring-filters";
 import { Pagination } from "@/components/pagination";
 import { PostCard } from "@/components/post-card";
 
-export function Posts() {
+export function MentoringList() {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const page = z.coerce.number().parse(searchParams.get("page") ?? "1");
@@ -41,7 +41,7 @@ export function Posts() {
 
       <div className="flex flex-col gap-4 items-center">
         <div className="space-y-6 w-full mx-4 px-2">
-          <PostFilters />
+          <MentoringFilters />
           <div className="flex flex-wrap gap-6 justify-center">
             {result?.posts.map((post) => (
               <PostCard key={post.id} post={post} />

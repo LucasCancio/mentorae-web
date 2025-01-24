@@ -13,7 +13,7 @@ const orderFiltersSchema = z.object({
 
 type TOrderFiltersSchema = z.infer<typeof orderFiltersSchema>;
 
-export function PostFilters() {
+export function MentoringFilters() {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const title = searchParams.get("title") || "";

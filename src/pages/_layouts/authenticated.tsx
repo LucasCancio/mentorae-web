@@ -5,7 +5,7 @@ import { Outlet, useNavigate } from "react-router";
 import { Header } from "@/components/header";
 import { api } from "@/lib/axios";
 
-export function AppLayout() {
+export function AuthenticatedLayout() {
   const navigate = useNavigate();
 
   useEffect(() => {

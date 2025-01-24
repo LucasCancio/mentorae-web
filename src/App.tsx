@@ -14,8 +14,8 @@ import { AuthenticationProvider } from "./contexts/authentication-context";
 function App() {
   return (
     <HelmetProvider>
-      <ThemeProvider storageKey="fiaposts-theme" defaultTheme="dark">
-        <Helmet titleTemplate="%s | fiaposts" />
+      <ThemeProvider storageKey="mentorae-theme" defaultTheme="dark">
+        <Helmet titleTemplate="%s | mentorae" />
         <Toaster richColors />
         <QueryClientProvider client={queryClient}>
           <AuthenticationProvider>
