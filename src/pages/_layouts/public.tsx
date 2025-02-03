@@ -2,23 +2,22 @@ import { Link, Outlet } from "react-router";
 
 export function PublicLayout() {
   return (
-    <div className="grid min-h-screen grid-cols-2 antialiased">
-      <div className="flex h-full flex-col justify-between border-r border-foreground/5 bg-muted p-10 text-muted-foreground">
+    <div className="min-h-screen flex flex-col-reverse md:grid md:grid-cols-[3fr_4fr] antialiased">
+      <div className="relative flex flex-col items-center justify-center">
+        <Outlet />
+      </div>
+      <div className="flex flex-1 h-full flex-col justify-between border-r border-foreground/5 bg-primary p-10 text-muted-foreground">
         <Link
           to="/"
           className="flex items-center gap-3 text-lg font-medium text-foreground"
         >
-          <img src="/logo.png" alt="mentorae" className="h-5 w-5" />
-          <span className="font-semibold">mentorae</span>
+          <img src="/images/logo.png" alt="Mentoraê" className="size-10" />
+          <h2 className="text-4xl font-semibold">Mentoraê</h2>
         </Link>
 
-        <footer className="text-sm">
-          Painel do professor &copy; mentorae - {new Date().getFullYear()}
-        </footer>
-      </div>
+        <img src="/images/landing.svg" alt="Educação" />
 
-      <div className="relative flex flex-col items-center justify-center">
-        <Outlet />
+        <footer className="text-sm">FIAP &copy; Mentoraê - 2025</footer>
       </div>
     </div>
   );

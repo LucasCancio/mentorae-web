@@ -10,7 +10,7 @@ export function NavLink(props: TNavLinkProps) {
   return (
     <Link
       data-current={isActive}
-      className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground data-[current=true]:text-foreground"
+      className="flex items-center gap-1.5 text-xl font-medium text-muted-foreground hover:text-foreground data-[current=true]:text-foreground"
       {...props}
     />
   );

@@ -12,14 +12,12 @@ import { Button } from "../ui/button";
 import { Menu, X } from "lucide-react";
 import { SidebarButtonSheet as SidebarButton } from "./sidebar-button";
 import { Link, useLocation } from "react-router";
-import { useAuthentication } from "@/contexts/authentication-context";
 
 interface SidebarMobileProps {
   sidebarItems: SidebarItems;
 }
 
 export function SidebarMobile(props: SidebarMobileProps) {
-  const { isLoggedIn } = useAuthentication();
   const { pathname } = useLocation();
 
   return (
@@ -31,7 +29,7 @@ export function SidebarMobile(props: SidebarMobileProps) {
       </SheetTrigger>
       <SheetContent side="left" className="px-3 py-4" hideClose>
         <SheetHeader className="flex flex-row justify-between items-center space-y-0">
-          <SheetTitle className="mx-3">Mentorae</SheetTitle>
+          <SheetTitle className="mx-3">Mentoraê</SheetTitle>
           <SheetClose asChild>
             <Button className="h-7 w-7 p-0" variant="ghost">
               <X size={15} />
@@ -41,8 +39,6 @@ export function SidebarMobile(props: SidebarMobileProps) {
         <div className="h-full">
           <div className="mt-5 flex flex-col w-full gap-1">
             {props.sidebarItems.links.map((link, idx) => {
-              if (link.onlyLogged && !isLoggedIn) return null;
-
               return (
                 <Link key={idx} to={link.href}>
                   <SidebarButton

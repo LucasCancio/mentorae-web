@@ -1,3 +1,4 @@
+import { Frown } from "lucide-react";
 import { Link, useRouteError } from "react-router";
 
 export function Error() {
@@ -5,7 +6,9 @@ export function Error() {
 
   return (
     <div className="flex h-screen flex-col items-center justify-center gap-2">
-      <h1 className="text-4xl font-bold">Whoops, algo aconteceu...</h1>
+      <h1 className="text-4xl font-bold flex items-center gap-4">
+        <Frown size={30} /> Whoops, algo aconteceu...
+      </h1>
       <p className="text-accent-foreground">
         Um erro aconteceu na aplicação, abaixo você encontra mais detalhes:
       </p>
@@ -14,8 +17,8 @@ export function Error() {
           {error?.message || JSON.stringify(error)}
         </code>
       </pre>
-      <pre className="text-accent-foreground">
-        Voltar para o{" "}
+      <pre className="text-accent-foreground mt-6">
+        Voltar para a{" "}
         <Link to="/" className="text-sky-500 dark:text-sky-400">
           Página principal
         </Link>

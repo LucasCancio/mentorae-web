@@ -1,8 +1,8 @@
-import axios from 'axios';
+import axios from "axios";
 
-import { env } from '@/env';
+import { env } from "@/env";
 
-export const api = axios.create({
+const api = axios.create({
   baseURL: env.VITE_API_URL,
   withCredentials: true,
 });
@@ -14,3 +14,5 @@ if (env.VITE_ENABLE_API_DELAY) {
     return config;
   });
 }
+
+export { api };

@@ -4,19 +4,19 @@ import { Outlet, useNavigate } from "react-router";
 
 import { Header } from "@/components/header";
 import { api } from "@/lib/axios";
+import { useAuthStore } from "@/store/authStore";
 
 export function AuthenticatedLayout() {
   const navigate = useNavigate();
+  const { token } = useAuthStore();
 
   useEffect(() => {
-    const interceptorId = api.interceptors.response.use(
+    const responseInterceptorId = api.interceptors.response.use(
       (response) => response,
       (error) => {
         if (isAxiosError(error)) {
           const status = error.response?.status;
-          const code = error.response?.data?.code;
-
-          if (status === 401 && code === "UNAUTHORIZED") {
+          if (status === 401) {
             navigate("/sign-in", { replace: true });
           }
         } else {
@@ -25,16 +25,22 @@ export function AuthenticatedLayout() {
       }
     );
 
+    const requestInterceptorId = api.interceptors.request.use((config) => {
+      config.headers.Authorization = `Bearer ${token}`;
+      return config;
+    });
+
     return () => {
-      api.interceptors.response.eject(interceptorId);
+      api.interceptors.response.eject(responseInterceptorId);
+      api.interceptors.request.eject(requestInterceptorId);
     };
-  }, [navigate]);
+  }, [navigate, token]);
 
   return (
     <div className="flex min-h-screen flex-col antialiased">
       <Header />
 
-      <div className="flex flex-1 flex-col gap-4 p-8 pt-6">
+      <div className="flex flex-1 flex-col gap-4 p-8 pt-6 max-w-[800px] w-full mx-auto shadow-xl">
         <Outlet />
       </div>
     </div>

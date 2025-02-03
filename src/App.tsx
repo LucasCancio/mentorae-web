@@ -6,24 +6,21 @@ import { Helmet, HelmetProvider } from "react-helmet-async";
 import { RouterProvider } from "react-router";
 import { Toaster } from "sonner";
 
-import { ThemeProvider } from "./components/theme/theme-provider";
-import { queryClient } from "./lib/react-query";
-import { router } from "./routes";
+import { queryClient } from "@/lib/react-query";
+import { router } from "@/routes";
 import { AuthenticationProvider } from "./contexts/authentication-context";
 
 function App() {
   return (
     <HelmetProvider>
-      <ThemeProvider storageKey="mentorae-theme" defaultTheme="dark">
-        <Helmet titleTemplate="%s | mentorae" />
-        <Toaster richColors />
-        <QueryClientProvider client={queryClient}>
-          <AuthenticationProvider>
-            <RouterProvider router={router} />
-          </AuthenticationProvider>
-          <ReactQueryDevtools initialIsOpen={false} />
-        </QueryClientProvider>
-      </ThemeProvider>
+      <Helmet titleTemplate="%s | Mentoraê" />
+      <Toaster richColors />
+      <QueryClientProvider client={queryClient}>
+        <AuthenticationProvider>
+          <RouterProvider router={router} />
+        </AuthenticationProvider>
+        <ReactQueryDevtools initialIsOpen={false} />
+      </QueryClientProvider>
     </HelmetProvider>
   );
 }

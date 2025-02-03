@@ -6,8 +6,7 @@ import { Pencil, Trash, TriangleAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { TableCell, TableRow } from "@/components/ui/table";
 
-import { TPost } from "@/api/posts/get-posts";
-import { deletePost } from "@/api/posts/delete-post";
+import { deleteJob } from "@/api/jobs/delete-job";
 import { toast } from "sonner";
 import { useNavigate } from "react-router";
 import {
@@ -20,22 +19,23 @@ import {
   DialogTrigger,
 } from "./ui/dialog";
 import { useState } from "react";
+import { TJob } from "@/api/models/Job";
 
 export interface IPostTableRowProps {
-  post: TPost;
+  job: TJob;
 }
 
-export function PostTableRow({ post }: IPostTableRowProps) {
+export function PostTableRow({ job }: IPostTableRowProps) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
   const { mutateAsync: deletePostFn, isPending: isDeletingPost } = useMutation({
-    mutationFn: deletePost,
+    mutationFn: deleteJob,
   });
 
   async function handleDeletePost() {
     try {
-      const { status } = await deletePostFn({ postId: post.id });
+      const { status } = await deletePostFn({ jobId: job.id });
       if (status !== 204) {
         throw new Error("Erro ao excluir post");
       }
@@ -55,20 +55,20 @@ export function PostTableRow({ post }: IPostTableRowProps) {
   return (
     <TableRow>
       <TableCell className="font-mono text-xs font-medium">
-        {post.title}
+        {job.title}
       </TableCell>
       <TableCell className="text-muted-foreground">
-        {formatDistanceToNow(post.updatedAt, {
+        {formatDistanceToNow(job.updatedAt, {
           locale: ptBR,
           addSuffix: true,
         })}
       </TableCell>
       <TableCell className="text-muted-foreground">
-        {format(post.createdAt, "dd/MM/yyyy", { locale: ptBR })}
+        {format(job.createdAt, "dd/MM/yyyy", { locale: ptBR })}
       </TableCell>
       <TableCell className="flex gap-2">
         <Button
-          onClick={() => navigate(`/post-details/${post.id}`)}
+          onClick={() => navigate(`/job-details/${job.id}`)}
           className="bg-blue-700"
           size="xs"
           title="Editar"
@@ -98,7 +98,7 @@ export function PostTableRow({ post }: IPostTableRowProps) {
               </DialogDescription>
             </DialogHeader>
             <p className="italic">
-              Essa ação é irreversível e excluirá permanentemente o post.
+              Essa ação é irreversível e excluirá permanentemente o job.
             </p>
             <div className="flex gap-2">
               <Button

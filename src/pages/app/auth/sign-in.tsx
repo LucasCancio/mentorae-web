@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useAuthStore } from "@/store/authStore";
 
 const signInForm = z.object({
   email: z.string().email("E-mail inválido."),
@@ -33,13 +34,23 @@ export function SignIn() {
     },
   });
 
+  const { setAuthType, setToken, setUserId } = useAuthStore();
+
   const { mutateAsync: authenticate } = useMutation({
     mutationFn: signIn,
   });
 
   async function handleSignIn(data: ISignInForm) {
     try {
-      await authenticate({ email: data.email, password: data.password });
+      const { token, user_id, user_type } = await authenticate({
+        email: data.email,
+        password: data.password,
+      });
+
+      setAuthType(user_type);
+      setToken(token);
+      setUserId(user_id);
+
       navigate("/");
     } catch (error) {
       toast.error("Credenciais inválidas.");
@@ -57,11 +68,9 @@ export function SignIn() {
 
         <div className="flex w-[350px] flex-col justify-center gap-6">
           <div className="flex flex-col gap-2 text-center">
-            <h1 className="text-2xl font-semibold tracking-tight">
-              Acessar painel
-            </h1>
+            <h1 className="text-2xl font-semibold tracking-tight">Acessar</h1>
             <p className="text-sm text-muted-foreground">
-              Acompanhe os seus posts pelo painel do professor!
+              Acompanhe suas vagas e mentorias!
             </p>
           </div>
 
@@ -93,14 +102,6 @@ export function SignIn() {
 
             <Button disabled={isSubmitting} className="w-full" type="submit">
               Acessar
-            </Button>
-            <Button
-              variant="secondary"
-              onClick={() => navigate("/")}
-              className="w-full"
-              type="button"
-            >
-              Acessar como visitante
             </Button>
           </form>
         </div>

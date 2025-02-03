@@ -5,6 +5,5 @@ export interface SidebarItems {
     label: string;
     href: string;
     icon?: LucideIcon;
-    onlyLogged?: boolean;
   }>;
 }

@@ -1,7 +1,6 @@
 import { UserPen, ChevronDown, LogOut, LogIn } from "lucide-react";
 import { useNavigate } from "react-router";
 
-import { StoreProfileDialog } from "./store-profile-dialog";
 import { Button } from "./ui/button";
 import { Dialog } from "./ui/dialog";
 import {
@@ -18,12 +17,17 @@ import { useAuthentication } from "@/contexts/authentication-context";
 import { useState } from "react";
 import { logout } from "@/api/auth/logout";
 import { useQueryClient } from "@tanstack/react-query";
+import { useAuthStore } from "@/store/authStore";
+import { StudentProfileDialog } from "./student-profile-dialog";
+import { TeacherProfileDialog } from "./teacher-profile-dialog";
+import { TTeacher } from "@/api/models/Teacher";
 
 export function AccountMenu() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
   const { data: profile, isLoading: isLoadingProfile } = useProfile();
+  const { authType } = useAuthStore();
   const { isLoggedIn, isLoadingAuthentication, logoutProfile } =
     useAuthentication();
 
@@ -102,10 +106,17 @@ export function AccountMenu() {
           open={isProfileDialogOpen}
           onOpenChange={(open) => setIsProfileDialogOpen(open)}
         >
-          {profile && (
-            <StoreProfileDialog
+          {profile && authType === "Student" && (
+            <StudentProfileDialog
               onClose={() => setIsProfileDialogOpen(false)}
               profile={profile}
+            />
+          )}
+
+          {profile && authType === "Teacher" && (
+            <TeacherProfileDialog
+              onClose={() => setIsProfileDialogOpen(false)}
+              profile={profile as TTeacher}
             />
           )}
         </Dialog>
