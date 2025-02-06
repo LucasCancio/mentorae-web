@@ -1,4 +1,4 @@
-import { TUser } from "./User";
+import { TUser } from "./User.model";
 
 export type TTeacher = TUser & {
   id: number;

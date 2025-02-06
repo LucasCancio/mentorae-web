@@ -1,7 +1,7 @@
-import { TStudent } from "@/api/models/Student";
-import { TTeacher } from "@/api/models/Teacher";
 import { getStudent } from "@/api/student/get-student";
 import { getTeacher } from "@/api/teacher/get-teacher";
+import { TStudent } from "@/models/Student.model";
+import { TTeacher } from "@/models/Teacher.model";
 import { useAuthStore } from "@/store/authStore";
 import { useQuery, UseQueryResult } from "@tanstack/react-query";
 

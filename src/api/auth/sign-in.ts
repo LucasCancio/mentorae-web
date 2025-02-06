@@ -1,11 +1,10 @@
 import { api } from "@/lib/axios";
+import { UserType } from "@/models/UserType.model";
 
 export interface ISignInBody {
   email: string;
   password: string;
 }
-
-export type UserType = "Teacher" | "Student";
 
 export interface ISignInResponse {
   token: string;
@@ -18,5 +17,8 @@ export async function signIn({ email, password }: ISignInBody) {
     email,
     password,
   });
-  return response.data as ISignInResponse;
+  const data = response.data as ISignInResponse;
+  api.defaults.headers.common["Authorization"] = `Bearer ${data.token}`;
+
+  return data;
 }

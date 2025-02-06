@@ -1,39 +1,37 @@
 import { api } from "@/lib/axios";
-import { TJob } from "@/models/Job.model";
+import { TMentoring } from "@/models/Mentoring.model";
 import {
-  IRequestWithPagination,
   TMetaPagination,
+  IRequestWithPagination,
 } from "@/models/Pagination.model";
 import { IGetTeacherResponse } from "../teacher/get-teacher";
 import { UserType } from "@/models/UserType.model";
 
-export type JobResponse = {
-  job_id: number;
-  title: string;
-  company: string;
-  job_type: string;
+export type MentoringResponse = {
+  matter: string;
+  mentoring_date: string;
+  mentoring_id: number;
   modality: string;
-  publication_date: string;
-  link: string;
-  quantity: number;
-  url_image: string;
+  likes: string;
+  has_liked: boolean;
   teacher: IGetTeacherResponse;
 };
-interface IGetJobsResponse {
-  data: JobResponse[];
+
+interface IGetMentoringResponse {
+  data: MentoringResponse[];
   meta: TMetaPagination;
 }
 
-type JobWithPagination = {
-  jobs: TJob[];
+type MentoringWithPagination = {
+  mentoring: TMentoring[];
   meta: TMetaPagination;
 };
 
-export async function getJobs({
+export async function getMentoringList({
   page,
   limit,
-}: IRequestWithPagination): Promise<JobWithPagination> {
-  const response = await api.get<IGetJobsResponse>("/job", {
+}: IRequestWithPagination): Promise<MentoringWithPagination> {
+  const response = await api.get<IGetMentoringResponse>("/mentoring", {
     params: {
       page,
       limit,
@@ -43,21 +41,18 @@ export async function getJobs({
   const { data, meta } = response.data;
   return {
     meta,
-    jobs: data.map(transformToJob),
+    mentoring: data.map(transformToMentoring),
   };
 }
 
-export function transformToJob(response: JobResponse): TJob {
+export function transformToMentoring(response: MentoringResponse): TMentoring {
   return {
-    id: response.job_id,
-    title: response.title,
-    company: response.company,
-    jobType: response.job_type,
+    id: response.mentoring_id,
+    hasLiked: response.has_liked,
+    likes: Number(response.likes) || 0,
+    matter: response.matter,
+    mentoringDate: response.mentoring_date,
     modality: response.modality,
-    publicationDate: response.publication_date,
-    link: response.link,
-    quantity: response.quantity,
-    urlImage: response.url_image,
     teacher: {
       id: response.teacher.teacher_id,
       email: response.teacher.user_account.email,

@@ -1,11 +1,11 @@
 export type TMetaPagination = {
   page: number;
   pageIndex: number;
-  perPage: number;
   totalCount: number;
+  perPage: number;
 };
 
 export interface IRequestWithPagination {
   page?: number | null;
-  perPage?: number | null;
+  limit?: number | null;
 }

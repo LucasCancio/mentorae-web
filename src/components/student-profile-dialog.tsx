@@ -3,7 +3,6 @@ import { DialogTitle } from "@radix-ui/react-dialog";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { z } from "zod";
 
 import { Button } from "./ui/button";
 import {
@@ -17,24 +16,11 @@ import { Label } from "./ui/label";
 import { Checkbox } from "./ui/checkbox";
 import { twMerge } from "tailwind-merge";
 import { updateStudent } from "@/api/student/update-student";
-import { TStudent } from "@/api/models/Student";
-
-const storeProfileSchema = z
-  .object({
-    email: z.string().email("E-mail inválido."),
-    name: z.string().min(3, "O nome deve ter no mínimo 3 caracteres."),
-    password: z.string().optional(),
-    staySamePassword: z.boolean().optional(),
-  })
-  .refine(
-    (data) => {
-      if (data.staySamePassword) return true;
-      return data.password && data.password?.length >= 6;
-    },
-    { message: "A senha deve ter no mínimo 6 caracteres.", path: ["password"] }
-  );
-
-type TStoreProfileForm = z.infer<typeof storeProfileSchema>;
+import { TStudent } from "@/models/Student.model";
+import {
+  TUpdateStudentSchema,
+  updateStudentSchema,
+} from "@/models/schemas/student.schema";
 
 type Props = {
   profile: TStudent;
@@ -67,8 +53,8 @@ export function StudentProfileDialog({ profile, onClose }: Props) {
     watch,
     reset,
     formState: { isSubmitting, errors },
-  } = useForm<TStoreProfileForm>({
-    resolver: zodResolver(storeProfileSchema),
+  } = useForm<TUpdateStudentSchema>({
+    resolver: zodResolver(updateStudentSchema),
     defaultValues: {
       email: profile?.email ?? "",
       name: profile?.name ?? "",
@@ -78,7 +64,7 @@ export function StudentProfileDialog({ profile, onClose }: Props) {
 
   const staySamePassword = watch("staySamePassword");
 
-  function updateProfileCache({ email, name }: TStoreProfileForm) {
+  function updateProfileCache({ email, name }: TUpdateStudentSchema) {
     const cached = queryClient.getQueryData<TStudent>(["profile"]);
 
     if (cached) {
@@ -92,7 +78,7 @@ export function StudentProfileDialog({ profile, onClose }: Props) {
     return { cached };
   }
 
-  async function handleUpdateProfile(data: TStoreProfileForm) {
+  async function handleUpdateProfile(data: TUpdateStudentSchema) {
     try {
       await updateProfileFn({
         id: profile.id,

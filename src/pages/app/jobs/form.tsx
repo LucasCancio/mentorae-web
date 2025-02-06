@@ -1,21 +1,15 @@
-import { updateOrRegisterJob } from "@/api/jobs/update-or-register-job";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { useProfile } from "@/hooks/use-profile";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect } from "react";
 import { Helmet } from "react-helmet-async";
-import { useFieldArray, useForm } from "react-hook-form";
-import { useNavigate, useParams } from "react-router";
+import { Controller, useForm } from "react-hook-form";
+import { useNavigate } from "react-router";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getJobById } from "@/api/jobs/get-job-by-id";
-import { Badge } from "@/components/ui/badge";
-import { Image, Save, Trash, Type, X } from "lucide-react";
+import { Image, Save, X } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -25,115 +19,106 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
+import { DatePicker } from "@/components/ui/date-picker";
+import { useAuthentication } from "@/contexts/authentication-context";
+import { useQueryParams } from "@/hooks/use-query-params";
+import { TCreateJobSchema, createJobSchema } from "@/models/schemas/job.schema";
+import { parseISO } from "date-fns";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { getJobById } from "@/api/jobs/get-job-by-id";
+import { updateOrRegisterJob } from "@/api/jobs/update-or-register-job";
 
-const postForm = z.object({
-  title: z.string().min(5, "O titulo deve conter no mínimo 5 caracteres."),
-  content: z
-    .string()
-    .min(20, "O conteúdo deve conter no mínimo 20 caracteres."),
-  imageUrl: z.string().url("A url da imagem deve ser válida.").optional(),
-  categories: z
-    .array(
-      z.object({
-        id: z.number(),
-        name: z.string(),
-        color: z.string(),
-      }),
-      {
-        required_error: "É preciso informar pelo menos 1 categoria.",
-      }
-    )
-    .min(1, "É preciso informar pelo menos 1 categoria.")
-    .max(3, "Só é permitido até no máximo 3 categorias."),
-});
-
-type TPostForm = z.infer<typeof postForm>;
+const modalities = ["Home Office", "Presencial", "Híbrido"];
+const jobTypes = ["Estágio", "Júnior", "Pleno", "Sênior", "Especialista"];
 
 export function JobForm() {
-  const { id: idParam } = useParams();
-  const postId = z.coerce.number().optional().parse(idParam);
-  const isEdditing = Boolean(postId);
-
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  const pageTitle = isEdditing ? "Editando Post" : "Criando um Post";
+  const { userId } = useAuthentication();
 
-  const { data: profile, isLoading: isLoadingProfile } = useProfile();
+  const query = useQueryParams();
+  const id = query.get("id");
 
-  const { data: post, isLoading: isLoadingPost } = useQuery({
-    queryKey: ["post", postId],
+  const jobId = z.coerce.number().optional().parse(id);
+  const isEdditing = Boolean(jobId);
+
+  const pageTitle = isEdditing ? "Editando Vaga" : "Criando uma Vaga";
+
+  const { data: job, isLoading } = useQuery({
+    queryKey: ["job", jobId],
     staleTime: 1000 * 60 * 5,
-    retry: 0,
+    retry: 1,
     queryFn: () =>
       getJobById({
-        id: postId ?? 0,
+        id: jobId ?? 0,
       }),
     enabled: isEdditing,
   });
 
-  useEffect(() => {
-    if (!isLoadingProfile && !profile) {
-      toast.error("Você precisa estar logado para acessar essa página.");
-      navigate("/");
-    }
-  }, [profile, isLoadingProfile]);
-
   const {
-    register,
-    handleSubmit,
     control,
+    register,
     watch,
+    handleSubmit,
     formState: { isSubmitting, errors },
-  } = useForm<TPostForm>({
-    resolver: zodResolver(postForm),
-    values: {
-      content: post?.content ?? "",
-      imageUrl: post?.imageUrl ?? "",
-      categories: [],
-      title: post?.title ?? "",
+  } = useForm<TCreateJobSchema>({
+    resolver: zodResolver(createJobSchema),
+    defaultValues: {
+      title: job?.title ?? undefined,
+      modality: job?.modality ?? modalities[0],
+      company: job?.company ?? undefined,
+      jobType: job?.jobType ?? jobTypes[0],
+      link: job?.link ?? undefined,
+      quantity: job?.quantity ?? 1,
+      urlImage: job?.urlImage ?? undefined,
+      publicationDate:
+        job?.publicationDate == null
+          ? new Date()
+          : parseISO(job.publicationDate),
     },
   });
 
-  const {
-    fields: categoriesField,
-    //append: appendCategory,
-    remove: removeCategory,
-  } = useFieldArray({
-    control,
-    name: "categories",
-  });
+  const urlImage = watch("urlImage");
 
-  const content = watch("content");
-  const imageUrl = watch("imageUrl");
-
-  const { mutateAsync: updateOrRegisterPostFn } = useMutation({
+  const { mutateAsync: updateOrRegisterJobFn } = useMutation({
     mutationFn: updateOrRegisterJob,
   });
 
-  async function handleSavePost(data: TPostForm) {
+  async function handleSaveMentoring(data: TCreateJobSchema) {
     try {
-      const result = await updateOrRegisterPostFn({
-        postId,
-        categoriesIds: data.categories.map((category) => category.id),
-        content: data.content,
-        slug: data.title.replace(/\s+/g, "-").toLowerCase(),
+      const result = await updateOrRegisterJobFn({
+        jobId,
+        company: data.company,
+        job_type: data.jobType,
+        link: data.link,
+        publication_date: data.publicationDate.toISOString(),
+        quantity: data.quantity,
         title: data.title,
-        imageUrl: data.imageUrl,
+        url_image: data.urlImage,
+        modality: data.modality,
+        teacher_id: userId,
       });
 
       if (result.status !== 201 && result.status !== 200) {
-        throw new Error("Erro ao salvar post");
+        throw new Error("Erro ao salvar vaga");
       }
 
-      queryClient.invalidateQueries({ queryKey: ["posts"] });
-      queryClient.invalidateQueries({ queryKey: ["my-posts"] });
-      queryClient.invalidateQueries({ queryKey: ["post", postId] });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["jobs"] }),
+        queryClient.invalidateQueries({ queryKey: ["job", jobId] }),
+      ]);
 
       toast.success(
-        isEdditing ? "Post salvo com sucesso!" : "Post cadastrado com sucesso!"
+        isEdditing ? "Vaga salva com sucesso!" : "Vaga cadastrada com sucesso!"
       );
-      navigate("/");
+      navigate("/jobs");
     } catch (error) {
       toast.error(
         "Erro ao realizar essa operação, tente novamente mais tarde!"
@@ -148,7 +133,7 @@ export function JobForm() {
       <div className="flex flex-col gap-4 max-w-[800px] w-full mx-auto flex-1">
         <h1 className="text-3xl font-bold tracking-tighter">{pageTitle}</h1>
 
-        {isLoadingProfile || isLoadingPost ? (
+        {isLoading ? (
           <div className="flex flex-col gap-4 w-full flex-1">
             <Skeleton className="w-full h-14" />
             <Skeleton className="w-full h-14" />
@@ -161,110 +146,142 @@ export function JobForm() {
           </div>
         ) : (
           <form
-            onSubmit={handleSubmit(handleSavePost)}
+            onSubmit={handleSubmit(handleSaveMentoring)}
             className="flex flex-col gap-4 w-full flex-1"
           >
             <div className="space-y-2">
-              <Label className="text-base" htmlFor="title">
-                Título
-              </Label>
-              <Input
-                id="title"
-                {...register("title")}
-                maxLength={60}
-                placeholder="Título do seu post"
-              />
+              <Label htmlFor="title">Título</Label>
+              <Input id="title" type="text" {...register("title")} />
               {errors.title && (
-                <span className="text-destructive">{errors.title.message}</span>
+                <span className="text-red-700">{errors.title.message}</span>
               )}
             </div>
 
             <div className="space-y-2">
-              <div className="flex justify-between items-center mb-2">
-                <Label className="text-base" htmlFor="imageUrl">
-                  Imagem (url)
-                </Label>
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button
-                      variant="outline"
-                      disabled={imageUrl?.length === 0 && !!errors?.imageUrl}
-                    >
-                      <Image className="size-4 mr-2" /> Prévia da imagem
-                    </Button>
-                  </DialogTrigger>
-                  <PostImagePreviewDialog imageUrl={imageUrl} />
-                </Dialog>
-              </div>
+              <Label htmlFor="company">Empresa</Label>
+              <Input id="company" type="text" {...register("company")} />
+              {errors.company && (
+                <span className="text-red-700">{errors.company.message}</span>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="jobType">Tipo de vaga</Label>
+              <Controller
+                control={control}
+                name="jobType"
+                render={({ field }) => (
+                  <Select
+                    defaultValue={field.value}
+                    value={field.value}
+                    disabled={field.disabled}
+                    name={field.name}
+                    onValueChange={(value) => field.onChange(value)}
+                  >
+                    <SelectTrigger className="">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {jobTypes?.map((jobType) => (
+                        <SelectItem key={jobType} value={jobType}>
+                          {jobType}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              {errors.jobType && (
+                <span className="text-red-700">{errors.jobType.message}</span>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="modality">Modalidade</Label>
+              <Controller
+                control={control}
+                name="modality"
+                render={({ field }) => (
+                  <Select
+                    defaultValue={field.value}
+                    value={field.value}
+                    disabled={field.disabled}
+                    name={field.name}
+                    onValueChange={(value) => field.onChange(value)}
+                  >
+                    <SelectTrigger className="">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {modalities?.map((modality) => (
+                        <SelectItem key={modality} value={modality}>
+                          {modality}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              {errors.modality && (
+                <span className="text-red-700">{errors.modality.message}</span>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="link">Link</Label>
+              <Input id="link" type="url" {...register("link")} />
+              {errors.link && (
+                <span className="text-red-700">{errors.link.message}</span>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="urlImage">Imagem da vaga (url)</Label>
+              <Input id="urlImage" type="url" {...register("urlImage")} />
+              {errors.urlImage && (
+                <span className="text-red-700">{errors.urlImage.message}</span>
+              )}
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button
+                    variant="outline"
+                    disabled={urlImage?.length === 0 || !!errors?.urlImage}
+                  >
+                    <Image className="size-4 mr-2" /> Prévia da imagem
+                  </Button>
+                </DialogTrigger>
+                <ImagePreviewDialog imageUrl={urlImage} />
+              </Dialog>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="quantity">Quantidade de vagas</Label>
               <Input
-                id="imageUrl"
-                type="url"
-                {...register("imageUrl")}
-                placeholder="Url da imagem principal do seu post"
+                id="quantity"
+                min={1}
+                type="number"
+                {...register("quantity")}
               />
-              {errors.imageUrl && (
-                <span className="text-destructive">
-                  {errors.imageUrl.message}
-                </span>
+              {errors.quantity && (
+                <span className="text-red-700">{errors.quantity.message}</span>
               )}
             </div>
 
-            <div className="flex flex-col gap-2">
-              <div className="flex flex-row gap-4 flex-wrap">
-                {categoriesField.map((field, index) => {
-                  return (
-                    <div key={field.id} className="flex flex-row">
-                      <Badge
-                        variant="outline"
-                        className="text-foreground py-2 px-4"
-                        key={field.id}
-                        style={{ color: field.color }}
-                      >
-                        {field.name}
-                        <button
-                          type="button"
-                          title="Remover categoria"
-                          className="text-destructive ml-2 hover:text-destructive-foreground transition-colors"
-                          onClick={() => removeCategory(index)}
-                        >
-                          <Trash className="size-4" />
-                        </button>
-                      </Badge>
-                    </div>
-                  );
-                })}
-              </div>
-
-              {errors.categories && (
-                <span className="text-destructive">
-                  {errors.categories.message}
-                </span>
-              )}
-            </div>
-
-            <div className="flex flex-col space-y-2 flex-1">
-              <div className="flex justify-between items-center mb-2">
-                <Label className="text-base" htmlFor="content">
-                  Conteúdo
-                </Label>
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button variant="outline" disabled={content?.length === 0}>
-                      <Type className="size-4 mr-2" /> Prévia do conteúdo
-                    </Button>
-                  </DialogTrigger>
-                  <PostContentPreviewDialog />
-                </Dialog>
-              </div>
-              <Textarea
-                id="content"
-                {...register("content")}
-                className="flex-1"
-                placeholder="Conteúdo do seu post (em MarkDown)"
+            <div className="space-y-2">
+              <Label htmlFor="publicationDate">Data de publicação</Label>
+              <Controller
+                control={control}
+                name="publicationDate"
+                render={({ field }) => (
+                  <DatePicker
+                    defaultValue={field.value}
+                    onSelect={(value) => field.onChange(value)}
+                  />
+                )}
               />
-              {errors.content && (
-                <span className="text-destructive">
-                  {errors.content.message}
+              {errors.publicationDate && (
+                <span className="text-red-700">
+                  {errors.publicationDate.message}
                 </span>
               )}
             </div>
@@ -275,10 +292,10 @@ export function JobForm() {
                 {isEdditing ? "Salvar" : "Cadastrar"}
               </Button>
               <Button
-                variant="secondary"
+                variant="outline"
                 className="w-full"
                 type="button"
-                onClick={() => navigate("/")}
+                onClick={() => navigate("/jobs")}
               >
                 <X className="size-5 mr-2" />
                 Cancelar
@@ -291,25 +308,11 @@ export function JobForm() {
   );
 }
 
-function PostContentPreviewDialog() {
-  return (
-    <DialogContent>
-      <DialogHeader>
-        <DialogTitle>Prévia do conteúdo</DialogTitle>
-        <DialogDescription hidden>
-          Essa é uma prévia do conteúdo
-        </DialogDescription>
-      </DialogHeader>
-      <Separator />
-    </DialogContent>
-  );
-}
-
-type PostImagePreviewDialogProps = {
+type ImagePreviewDialogProps = {
   imageUrl: string | undefined;
 };
 
-function PostImagePreviewDialog({ imageUrl }: PostImagePreviewDialogProps) {
+function ImagePreviewDialog({ imageUrl }: ImagePreviewDialogProps) {
   return (
     <DialogContent>
       <DialogHeader>
@@ -319,7 +322,7 @@ function PostImagePreviewDialog({ imageUrl }: PostImagePreviewDialogProps) {
         </DialogDescription>
       </DialogHeader>
       <Separator />
-      <img className="size-full" src={imageUrl} alt="Imagem do post" />
+      <img className="size-full" src={imageUrl} alt="Imagem" />
     </DialogContent>
   );
 }

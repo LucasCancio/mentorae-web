@@ -1,4 +1,4 @@
-import { TTeacher } from "@/api/models/Teacher";
+import { TTeacher } from "@/models/Teacher.model";
 import { format, formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { GraduationCap } from "lucide-react";

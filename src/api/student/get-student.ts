@@ -1,6 +1,6 @@
 import { api } from "@/lib/axios";
-import { TStudent } from "../models/Student";
-import { UserType } from "../auth/sign-in";
+import { TStudent } from "@/models/Student.model";
+import { UserType } from "@/models/UserType.model";
 
 interface IGetStudentResponse {
   student_id: number;

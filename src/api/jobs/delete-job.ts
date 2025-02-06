@@ -5,5 +5,5 @@ export interface IDeleteJobParams {
 }
 
 export async function deleteJob({ jobId }: IDeleteJobParams) {
-  return await api.delete(`/jobs/${jobId}`);
+  return await api.delete(`/job/${jobId}`);
 }

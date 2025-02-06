@@ -3,22 +3,16 @@ import { Helmet } from "react-helmet-async";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router";
 import { toast } from "sonner";
-import { z } from "zod";
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { registerStudent } from "@/api/student/register-student";
-import { ArrowLeft, ChevronLeft } from "lucide-react";
-
-export const studentSignUpForm = z.object({
-  name: z.string().min(3, "O nome deve ter no mínimo 3 caracteres."),
-  email: z.string().email("E-mail inválido."),
-  password: z.string().min(6, "A senha deve ter no mínimo 6 caracteres."),
-});
-
-export type TStudentSignUpForm = z.infer<typeof studentSignUpForm>;
+import { ArrowLeft } from "lucide-react";
+import {
+  createStudentSchema,
+  TCreateStudentSchema,
+} from "@/models/schemas/student.schema";
 
 export function StudentSignUp() {
   const navigate = useNavigate();
@@ -28,15 +22,15 @@ export function StudentSignUp() {
     register,
     handleSubmit,
     formState: { isSubmitting, errors },
-  } = useForm<TStudentSignUpForm>({
-    resolver: zodResolver(studentSignUpForm),
+  } = useForm<TCreateStudentSchema>({
+    resolver: zodResolver(createStudentSchema),
   });
 
   const { mutateAsync: registerStudentFn } = useMutation({
     mutationFn: registerStudent,
   });
 
-  async function handleSignUp(data: TStudentSignUpForm) {
+  async function handleSignUp(data: TCreateStudentSchema) {
     try {
       await registerStudentFn({
         email: data.email,

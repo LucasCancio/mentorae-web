@@ -1,4 +1,4 @@
-import { UserType } from "@/api/auth/sign-in";
+import { UserType } from "@/models/UserType.model";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 

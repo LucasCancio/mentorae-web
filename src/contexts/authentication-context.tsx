@@ -7,13 +7,14 @@ import {
 } from "react";
 
 import { useProfile } from "@/hooks/use-profile";
-import { UserType } from "@/api/auth/sign-in";
+import { UserType } from "@/models/UserType.model";
 
 interface IAuthenticationContextType {
   isLoggedIn: boolean | null;
   isLoadingAuthentication: boolean;
   logoutProfile: () => void;
   userType: UserType;
+  userId: number;
 }
 
 interface IAuthenticationProviderProps {
@@ -51,6 +52,7 @@ export function AuthenticationProvider({
         isLoadingAuthentication,
         logoutProfile,
         userType: profile?.userType || "Student",
+        userId: profile?.id || 0,
       }}
     >
       {children}

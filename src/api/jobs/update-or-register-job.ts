@@ -1,37 +1,53 @@
 import { api } from "@/lib/axios";
 
 export interface ISaveJobBody {
-  postId?: number;
+  jobId?: number;
   title: string;
-  content: string;
-  slug: string;
-  categoriesIds: number[];
-  imageUrl?: string | undefined | null;
+  company: string;
+  job_type: string;
+  modality: string;
+  publication_date: string;
+  link: string;
+  quantity: number;
+  url_image: string;
+  teacher_id: number;
 }
 
 export async function updateOrRegisterJob({
-  postId,
+  jobId,
   title,
-  content,
-  slug,
-  categoriesIds,
-  imageUrl,
+  company,
+  job_type,
+  modality,
+  publication_date,
+  link,
+  quantity,
+  url_image,
+  teacher_id,
 }: ISaveJobBody) {
-  if (postId) {
-    return await api.patch(`/jobs/${postId}`, {
+  if (jobId) {
+    return await api.put(`/job/${jobId}`, {
       title,
-      content,
-      slug,
-      categoriesIds,
-      imageUrl,
+      company,
+      job_type,
+      modality,
+      publication_date,
+      link,
+      quantity,
+      url_image,
+      teacher_id,
     });
   }
 
-  return await api.post("/jobs", {
+  return await api.post("/job", {
     title,
-    content,
-    slug,
-    categoriesIds,
-    imageUrl,
+    company,
+    job_type,
+    modality,
+    publication_date,
+    link,
+    quantity,
+    url_image,
+    teacher_id,
   });
 }

@@ -12,6 +12,7 @@ export interface IPaginationProps {
   totalCount: number;
   perPage: number;
   onPageChange: (pageIndex: number) => Promise<void> | void;
+  totalLabel?: string;
 }
 
 export function Pagination({
@@ -19,6 +20,7 @@ export function Pagination({
   perPage,
   totalCount,
   onPageChange,
+  totalLabel = "registro(s)",
 }: IPaginationProps) {
   const pages = Math.ceil(totalCount / perPage) || 1;
 
@@ -28,7 +30,7 @@ export function Pagination({
   return (
     <div className="flex items-center justify-between w-full">
       <span className="text-sm text-muted-foreground">
-        Total de {totalCount} post(s)
+        Total de {totalCount} {totalLabel}
       </span>
 
       <div className="flex items-center gap-6 lg:gap-8">

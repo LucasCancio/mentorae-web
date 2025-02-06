@@ -6,8 +6,8 @@ import { NavLink } from "../nav-link";
 
 const sidebarItems: SidebarItems = {
   links: [
-    { label: "Vagas", href: "/", icon: BriefcaseBusiness },
-    { label: "Mentorias", href: "/mentoring", icon: Presentation },
+    { label: "Mentorias", href: "/", icon: Presentation },
+    { label: "Vagas", href: "/jobs", icon: BriefcaseBusiness },
   ],
 };
 

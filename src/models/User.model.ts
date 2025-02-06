@@ -1,4 +1,4 @@
-import { UserType } from "../auth/sign-in";
+import { UserType } from "./UserType.model";
 
 export type TUser = {
   userId: number;

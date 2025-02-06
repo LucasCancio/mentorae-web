@@ -3,7 +3,6 @@ import { Helmet } from "react-helmet-async";
 import { Controller, useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router";
 import { toast } from "sonner";
-import { z } from "zod";
 
 import { registerTeacher } from "@/api/teacher/register-teacher";
 import { Button } from "@/components/ui/button";
@@ -13,35 +12,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft } from "lucide-react";
-import { isValidCPF } from "@/utils/valid-cpf";
-
-export const teacherSignUpForm = z
-  .object({
-    name: z.string().min(3, "O nome deve ter no mínimo 3 caracteres."),
-    email: z.string().email("E-mail inválido."),
-    phone: z.coerce
-      .number({ message: "O celular deve conter apenas números." })
-      .refine((x) => x.toString().length >= 11, {
-        message: "O celular deve ter no mínimo 11 caracteres.",
-      }),
-    personalId: z.coerce
-      .number({ message: "O CPF deve conter apenas números." })
-      .refine((x) => isValidCPF(x.toString()), {
-        message: "CPF inválido.",
-      })
-      .refine((x) => x.toString().length >= 11, {
-        message: "O CPF deve ter no mínimo 11 caracteres.",
-      }),
-    password: z.string().min(6, "A senha deve ter no mínimo 6 caracteres."),
-    isMentored: z.boolean(),
-    bio: z.string().optional(),
-  })
-  .refine((data) => !(data.isMentored && !data.bio?.length), {
-    message: "Se você é mentorado, precisa preencher a bio.",
-    path: ["bio"],
-  });
-
-export type TTeacherSignUpForm = z.infer<typeof teacherSignUpForm>;
+import {
+  createTeacherSchema,
+  TCreateTeacherSchema,
+} from "@/models/schemas/teacher.schema";
 
 export function TeacherSignUp() {
   const navigate = useNavigate();
@@ -53,8 +27,8 @@ export function TeacherSignUp() {
     handleSubmit,
     watch,
     formState: { isSubmitting, errors },
-  } = useForm<TTeacherSignUpForm>({
-    resolver: zodResolver(teacherSignUpForm),
+  } = useForm<TCreateTeacherSchema>({
+    resolver: zodResolver(createTeacherSchema),
     defaultValues: {
       isMentored: false,
     },
@@ -66,7 +40,7 @@ export function TeacherSignUp() {
     mutationFn: registerTeacher,
   });
 
-  async function handleSignUp(data: TTeacherSignUpForm) {
+  async function handleSignUp(data: TCreateTeacherSchema) {
     try {
       await registerTeacherFn({
         email: data.email,
@@ -160,7 +134,7 @@ export function TeacherSignUp() {
                 id="phone"
                 type="tel"
                 minLength={11}
-                maxLength={14}
+                maxLength={20}
                 autoComplete="tel"
                 {...register("phone")}
               />

@@ -10,6 +10,15 @@ export function AuthenticatedLayout() {
   const navigate = useNavigate();
   const { token } = useAuthStore();
 
+  /*  const { data: profile, isLoading: isLoadingProfile } = useProfile();
+
+  useEffect(() => {
+    if (!isLoadingProfile && !profile) {
+      toast.error("Você precisa estar logado para acessar essa página.");
+      navigate("/");
+    }
+  }, [profile, isLoadingProfile]) */
+
   useEffect(() => {
     const responseInterceptorId = api.interceptors.response.use(
       (response) => response,

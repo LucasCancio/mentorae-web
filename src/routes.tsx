@@ -9,6 +9,8 @@ import { createBrowserRouter } from "react-router";
 import { Jobs } from "./pages/app/jobs";
 import { StudentSignUp } from "./pages/app/auth/student-sign-up";
 import { SignUp } from "./pages/app/auth/sign-up";
+import { JobForm } from "./pages/app/jobs/form";
+import { MentoringForm } from "./pages/app/mentoring/form";
 
 export const router = createBrowserRouter([
   {
@@ -16,8 +18,10 @@ export const router = createBrowserRouter([
     element: <AuthenticatedLayout />,
     errorElement: <Error />,
     children: [
-      { path: "/", element: <Jobs /> },
-      { path: "/mentoring", element: <Mentoring /> },
+      { path: "/", element: <Mentoring /> },
+      { path: "/mentoring-form", element: <MentoringForm /> },
+      { path: "/jobs", element: <Jobs /> },
+      { path: "/job-form", element: <JobForm /> },
     ],
   },
   {

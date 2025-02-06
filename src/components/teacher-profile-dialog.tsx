@@ -3,7 +3,6 @@ import { DialogTitle } from "@radix-ui/react-dialog";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { z } from "zod";
 
 import { Button } from "./ui/button";
 import {
@@ -17,41 +16,12 @@ import { Label } from "./ui/label";
 import { updateTeacher } from "@/api/teacher/update-teacher";
 import { Checkbox } from "./ui/checkbox";
 import { twMerge } from "tailwind-merge";
-import { TTeacher } from "@/api/models/Teacher";
 import { Textarea } from "./ui/textarea";
-import { isValidCPF } from "@/utils/valid-cpf";
-
-const storeProfileSchema = z
-  .object({
-    staySamePassword: z.boolean().optional(),
-    password: z.string().optional(),
-    name: z.string().min(3, "O nome deve ter no mínimo 3 caracteres."),
-    email: z.string().email("E-mail inválido."),
-    phone: z.coerce
-      .number({ message: "O celular deve conter apenas números." })
-      .refine((x) => x.toString().length >= 11, {
-        message: "O celular deve ter no mínimo 11 caracteres.",
-      }),
-    personalId: z.coerce
-      .number({ message: "O CPF deve conter apenas números." })
-      .refine((x) => isValidCPF(x.toString()), {
-        message: "CPF inválido.",
-      })
-      .refine((x) => x.toString().length >= 11, {
-        message: "O CPF deve ter no mínimo 11 caracteres.",
-      }),
-    isMentored: z.boolean(),
-    bio: z.string().optional(),
-  })
-  .refine(
-    (data) => {
-      if (data.staySamePassword) return true;
-      return data.password && data.password?.length >= 6;
-    },
-    { message: "A senha deve ter no mínimo 6 caracteres.", path: ["password"] }
-  );
-
-type TStoreProfileForm = z.infer<typeof storeProfileSchema>;
+import { TTeacher } from "@/models/Teacher.model";
+import {
+  TUpdateTeacherSchema,
+  updateTeacherSchema,
+} from "@/models/schemas/teacher.schema";
 
 type Props = {
   profile: TTeacher;
@@ -101,8 +71,8 @@ export function TeacherProfileDialog({ profile, onClose }: Props) {
     watch,
     reset,
     formState: { isSubmitting, errors },
-  } = useForm<TStoreProfileForm>({
-    resolver: zodResolver(storeProfileSchema),
+  } = useForm<TUpdateTeacherSchema>({
+    resolver: zodResolver(updateTeacherSchema),
     defaultValues: {
       name: profile?.name ?? "",
       email: profile?.email ?? "",
@@ -124,7 +94,7 @@ export function TeacherProfileDialog({ profile, onClose }: Props) {
     personalId,
     phone,
     bio,
-  }: TStoreProfileForm) {
+  }: TUpdateTeacherSchema) {
     const cached = queryClient.getQueryData<TTeacher>(["profile"]);
 
     if (cached) {
@@ -142,7 +112,7 @@ export function TeacherProfileDialog({ profile, onClose }: Props) {
     return { cached };
   }
 
-  async function handleUpdateProfile(data: TStoreProfileForm) {
+  async function handleUpdateProfile(data: TUpdateTeacherSchema) {
     try {
       await updateProfileFn({
         id: profile.id,
@@ -241,7 +211,7 @@ export function TeacherProfileDialog({ profile, onClose }: Props) {
               id="phone"
               type="tel"
               minLength={11}
-              maxLength={14}
+              maxLength={20}
               autoComplete="tel"
               {...register("phone")}
             />

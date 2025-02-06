@@ -15,12 +15,11 @@ import { Skeleton } from "./ui/skeleton";
 import { useProfile } from "@/hooks/use-profile";
 import { useAuthentication } from "@/contexts/authentication-context";
 import { useState } from "react";
-import { logout } from "@/api/auth/logout";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuthStore } from "@/store/authStore";
 import { StudentProfileDialog } from "./student-profile-dialog";
 import { TeacherProfileDialog } from "./teacher-profile-dialog";
-import { TTeacher } from "@/api/models/Teacher";
+import { TTeacher } from "@/models/Teacher.model";
 
 export function AccountMenu() {
   const navigate = useNavigate();
@@ -32,9 +31,8 @@ export function AccountMenu() {
     useAuthentication();
 
   async function handleSignOut() {
-    await logout();
     logoutProfile();
-    queryClient.invalidateQueries({ queryKey: ["profile"] });
+    await queryClient.invalidateQueries({ queryKey: ["profile"] });
     navigate("/sign-in", { replace: true });
   }
 
