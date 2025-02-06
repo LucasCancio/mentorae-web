@@ -69,12 +69,8 @@ export function TeacherSignUp() {
       <Helmet title="Cadastro" />
 
       <div className="p-8">
-        <Button asChild variant="ghost" className="absolute right-4 top-8">
-          <Link to="/sign-in">Fazer login</Link>
-        </Button>
-
         <div className="flex w-[350px] flex-col justify-center gap-6">
-          <div className="flex flex-row items-end gap-4">
+          <div className="flex flex-row items-center gap-4">
             <Link to="/sign-up" title="Voltar">
               <ArrowLeft className="size-6" />
             </Link>
@@ -83,7 +79,10 @@ export function TeacherSignUp() {
             </h1>
           </div>
 
-          <form onSubmit={handleSubmit(handleSignUp)} className="space-y-4">
+          <form
+            onSubmit={handleSubmit(handleSignUp)}
+            className="space-y-4 overflow-auto"
+          >
             <div className="space-y-2">
               <Label htmlFor="name">Seu nome</Label>
               <Input
@@ -204,6 +203,9 @@ export function TeacherSignUp() {
             </p>
           </form>
         </div>
+        <Button asChild variant="ghost" className="absolute right-8 bottom-8">
+          <Link to="/sign-in">Fazer login</Link>
+        </Button>
       </div>
     </>
   );

@@ -1,23 +1,19 @@
+import { Logo } from "@/components/logo";
 import { Link, Outlet } from "react-router";
 
 export function PublicLayout() {
   return (
     <div className="min-h-screen flex flex-col-reverse md:grid md:grid-cols-[3fr_4fr] antialiased">
-      <div className="relative flex flex-col items-center justify-center">
+      <div className="relative flex flex-col items-center justify-center bg-slate-950 p-10">
+        <Logo className="absolute top-8" />
         <Outlet />
       </div>
-      <div className="flex flex-1 h-full flex-col justify-between border-r border-foreground/5 bg-primary p-10 text-muted-foreground">
-        <Link
-          to="/"
-          className="flex items-center gap-3 text-lg font-medium text-foreground"
-        >
-          <img src="/images/logo.png" alt="Mentoraê" className="size-10" />
-          <h2 className="text-4xl font-semibold">Mentoraê</h2>
-        </Link>
+      <div className="relative h-full flex justify-between border-r rounded-l-md border-foreground/5 bg-primary text-muted-foreground">
+        <img src="/images/landing.svg" alt="Educação" className="flex-1" />
 
-        <img src="/images/landing.svg" alt="Educação" />
-
-        <footer className="text-sm">FIAP &copy; Mentoraê - 2025</footer>
+        <footer className="text-sm absolute bottom-8 left-1/2 transform -translate-x-1/2">
+          FIAP &copy; Mentoraê - 2025
+        </footer>
       </div>
     </div>
   );
