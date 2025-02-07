@@ -19,7 +19,7 @@ function App() {
         <AuthenticationProvider>
           <RouterProvider router={router} />
         </AuthenticationProvider>
-        <ReactQueryDevtools initialIsOpen={false} />
+        {/* <ReactQueryDevtools initialIsOpen={false} /> */}
       </QueryClientProvider>
     </HelmetProvider>
   );

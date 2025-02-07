@@ -37,7 +37,6 @@ export function StudentProfileDialog({ profile, onClose }: Props) {
     handleSubmit,
     control,
     watch,
-    reset,
     formState: { isSubmitting, errors },
   } = useForm<TUpdateStudentSchema>({
     resolver: zodResolver(updateStudentSchema),
@@ -69,7 +68,6 @@ export function StudentProfileDialog({ profile, onClose }: Props) {
 
   async function handleClose() {
     await onClose();
-    reset();
   }
 
   return (

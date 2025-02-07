@@ -8,6 +8,7 @@ import {
 
 import { useProfile } from "@/hooks/use-profile";
 import { UserType } from "@/models/UserType.model";
+import { useAuthStore } from "@/store/authStore";
 
 interface IAuthenticationContextType {
   isLoggedIn: boolean | null;
@@ -30,7 +31,9 @@ export function AuthenticationProvider({
 }: IAuthenticationProviderProps) {
   const { data: profile, isLoading: isLoadingProfile } = useProfile();
 
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
+  const { token } = useAuthStore();
+
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(!!token);
   const [isLoadingAuthentication, setIsLoadingAuthentication] =
     useState<boolean>(true);
 

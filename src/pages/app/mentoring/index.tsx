@@ -37,6 +37,7 @@ export function Mentoring() {
 
     return {
       isMentor,
+      isTeacher,
     };
   }, [profile]);
 

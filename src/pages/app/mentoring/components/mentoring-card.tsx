@@ -118,7 +118,10 @@ export function MentoringCard({ mentoring }: Props) {
         </div>
       </div>
 
-      <time className="text-sm flex gap-2 items-center text-muted font-semibold">
+      <time
+        title="Data de mentoria"
+        className="text-sm flex gap-2 items-center text-muted font-semibold"
+      >
         <Calendar className="size-5" />
         {capitalize(
           format(mentoring.mentoringDate, "eeee, dd LLLL yyyy", {
@@ -127,7 +130,10 @@ export function MentoringCard({ mentoring }: Props) {
         )}
       </time>
 
-      <span className="text-sm flex gap-2 items-center text-muted font-semibold">
+      <span
+        title="Modalidade"
+        className="text-sm flex gap-2 items-center text-muted font-semibold"
+      >
         <MapPin className="size-5" />
         {mentoring.modality}
       </span>

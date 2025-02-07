@@ -16,6 +16,7 @@ import {
   createTeacherSchema,
   TCreateTeacherSchema,
 } from "@/models/schemas/teacher.schema";
+import { twMerge } from "tailwind-merge";
 
 export function TeacherSignUp() {
   const navigate = useNavigate();
@@ -68,7 +69,7 @@ export function TeacherSignUp() {
     <>
       <Helmet title="Cadastro" />
 
-      <div className="p-8">
+      <div className={twMerge("p-8", isMentored && "pb-0  pt-16")}>
         <div className="flex w-[350px] flex-col justify-center gap-6">
           <div className="flex flex-row items-center gap-4">
             <Link to="/sign-up" title="Voltar">

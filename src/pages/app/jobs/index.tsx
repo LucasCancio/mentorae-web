@@ -8,6 +8,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "react-router";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
+import { useMemo } from "react";
+import { useProfile } from "@/hooks/use-profile";
 
 const perPage = 4;
 
@@ -25,20 +27,32 @@ export function Jobs() {
       }),
   });
 
+  const { data: profile } = useProfile();
+
+  const { isTeacher } = useMemo(() => {
+    const isTeacher = profile?.userType === "Teacher";
+    return {
+      isTeacher,
+    };
+  }, [profile]);
+
   return (
     <>
       <Helmet title="Posts" />
 
       <div className="flex flex-col mt-2 flex-1 w-full mx-auto">
-        <Button
-          className="mb-5 w-36 bg-green-600 flex justify-center items-center gap-2 mx-auto"
-          asChild
-        >
-          <Link to="/job-form">
-            <Plus className="size-5" />
-            Criar vaga
-          </Link>
-        </Button>
+        {isTeacher && (
+          <Button
+            className="mb-5 w-36 bg-green-600 flex justify-center items-center gap-2 mx-auto"
+            asChild
+          >
+            <Link to="/job-form">
+              <Plus className="size-5" />
+              Criar vaga
+            </Link>
+          </Button>
+        )}
+
         <div className="flex flex-wrap gap-4 flex-row justify-center">
           {!result || isLoading ? (
             <>

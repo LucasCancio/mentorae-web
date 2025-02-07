@@ -38,7 +38,6 @@ export function TeacherProfileDialog({ profile, onClose }: Props) {
     handleSubmit,
     control,
     watch,
-    reset,
     formState: { isSubmitting, errors },
   } = useForm<TUpdateTeacherSchema>({
     resolver: zodResolver(updateTeacherSchema),
@@ -79,7 +78,6 @@ export function TeacherProfileDialog({ profile, onClose }: Props) {
 
   async function handleClose() {
     await onClose();
-    reset();
   }
 
   return (
