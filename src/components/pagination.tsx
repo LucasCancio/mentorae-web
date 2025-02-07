@@ -28,7 +28,7 @@ export function Pagination({
   const isLastPage = pages <= pageIndex + 1;
 
   return (
-    <div className="flex items-center justify-between w-full">
+    <div className="flex items-center justify-between w-full pt-6 px-6 mt-auto mb-10">
       <span className="text-sm text-muted-foreground">
         Total de {totalCount} {totalLabel}
       </span>

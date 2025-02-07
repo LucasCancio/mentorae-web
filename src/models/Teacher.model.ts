@@ -5,5 +5,5 @@ export type TTeacher = TUser & {
   phone: string;
   personalId: string;
   isMentored: boolean;
-  bio?: string;
+  bio?: string | null;
 };

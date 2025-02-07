@@ -9,7 +9,7 @@ export function Error() {
       <h1 className="text-4xl font-bold flex items-center gap-4">
         <Frown size={30} /> Whoops, algo aconteceu...
       </h1>
-      <p className="text-accent-foreground">
+      <p className="text-muted">
         Um erro aconteceu na aplicação, abaixo você encontra mais detalhes:
       </p>
       <pre>
@@ -17,7 +17,7 @@ export function Error() {
           {error?.message || JSON.stringify(error)}
         </code>
       </pre>
-      <pre className="text-accent-foreground mt-6">
+      <pre className="text-muted mt-6">
         Voltar para a{" "}
         <Link to="/" className="text-sky-500 dark:text-sky-400">
           Página principal

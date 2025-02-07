@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { DialogTitle } from "@radix-ui/react-dialog";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -24,26 +24,12 @@ import {
 
 type Props = {
   profile: TStudent;
-  onClose: () => void;
+  onClose: () => Promise<void>;
 };
 
 export function StudentProfileDialog({ profile, onClose }: Props) {
-  const queryClient = useQueryClient();
-
   const { mutateAsync: updateProfileFn } = useMutation({
     mutationFn: updateStudent,
-    onMutate({ email, name }) {
-      const { cached } = updateProfileCache({ email, name });
-
-      return {
-        previousProfile: cached,
-      };
-    },
-    onError(_, __, context) {
-      if (context?.previousProfile) {
-        updateProfileCache(context.previousProfile);
-      }
-    },
   });
 
   const {
@@ -64,20 +50,6 @@ export function StudentProfileDialog({ profile, onClose }: Props) {
 
   const staySamePassword = watch("staySamePassword");
 
-  function updateProfileCache({ email, name }: TUpdateStudentSchema) {
-    const cached = queryClient.getQueryData<TStudent>(["profile"]);
-
-    if (cached) {
-      queryClient.setQueryData<TStudent>(["profile"], {
-        ...cached,
-        email,
-        name,
-      });
-    }
-
-    return { cached };
-  }
-
   async function handleUpdateProfile(data: TUpdateStudentSchema) {
     try {
       await updateProfileFn({
@@ -88,17 +60,16 @@ export function StudentProfileDialog({ profile, onClose }: Props) {
       });
 
       toast.success("Perfil atualizado com sucesso");
-      handleClose();
+      await handleClose();
     } catch (error) {
       console.error(error);
-
       toast.error("Falha ao atualizar o perfil, tente novamente!");
     }
   }
 
-  function handleClose() {
+  async function handleClose() {
+    await onClose();
     reset();
-    onClose();
   }
 
   return (

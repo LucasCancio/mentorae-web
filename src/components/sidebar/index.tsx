@@ -18,11 +18,11 @@ export function Sidebar() {
 
   if (isDesktop) {
     return (
-      <nav className="flex items-center space-x-4 lg:space-x-6 md:ml-4 gap-4">
+      <nav className="flex-1 flex flex-row items-center justify-center space-x-4 lg:space-x-6 gap-4">
         {sidebarItems.links.map((link, idx) => {
           return (
             <NavLink key={idx} to={link.href}>
-              {link.icon && <link.icon className="h-4 w-4" />}
+              {link.icon && <link.icon className="size-6" />}
               {link.label}
             </NavLink>
           );

@@ -12,6 +12,7 @@ import { Button } from "../ui/button";
 import { Menu, X } from "lucide-react";
 import { SidebarButtonSheet as SidebarButton } from "./sidebar-button";
 import { Link, useLocation } from "react-router";
+import { Logo } from "../logo";
 
 interface SidebarMobileProps {
   sidebarItems: SidebarItems;
@@ -29,7 +30,9 @@ export function SidebarMobile(props: SidebarMobileProps) {
       </SheetTrigger>
       <SheetContent side="left" className="px-3 py-4" hideClose>
         <SheetHeader className="flex flex-row justify-between items-center space-y-0">
-          <SheetTitle className="mx-3">Mentoraê</SheetTitle>
+          <SheetTitle className="mx-3">
+            <Logo />
+          </SheetTitle>
           <SheetClose asChild>
             <Button className="h-7 w-7 p-0" variant="ghost">
               <X size={15} />
@@ -42,7 +45,7 @@ export function SidebarMobile(props: SidebarMobileProps) {
               return (
                 <Link key={idx} to={link.href}>
                   <SidebarButton
-                    variant={pathname === link.href ? "secondary" : "ghost"}
+                    variant={pathname === link.href ? "default" : "ghost"}
                     icon={link.icon}
                     className="w-full"
                   >

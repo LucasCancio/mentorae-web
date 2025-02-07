@@ -13,7 +13,6 @@ import { Button } from "./ui/button";
 type Props = {
   isDeleteDialogOpen: boolean;
   setIsDeleteDialogOpen: (value: boolean) => void;
-  isDeleting: boolean;
   onYesClick: () => void;
 };
 
@@ -21,14 +20,11 @@ export function ExcludeConfirmationDialog({
   isDeleteDialogOpen,
   setIsDeleteDialogOpen,
   onYesClick,
-  isDeleting,
 }: Props) {
   return (
     <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-      <DialogTrigger asChild>
-        <Button disabled={isDeleting} variant="destructive" title="Excluir">
-          <Trash className="size-4" /> Excluir
-        </Button>
+      <DialogTrigger className="flex gap-2 hover:opacity-90">
+        <Trash className="size-4" /> Excluir
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

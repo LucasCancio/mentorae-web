@@ -1,8 +1,9 @@
 import { Link, LinkProps, useLocation } from "react-router";
+import { twMerge } from "tailwind-merge";
 
 export type TNavLinkProps = LinkProps;
 
-export function NavLink(props: TNavLinkProps) {
+export function NavLink({ className, ...props }: TNavLinkProps) {
   const { pathname } = useLocation();
 
   const isActive = pathname === props.to;
@@ -10,7 +11,10 @@ export function NavLink(props: TNavLinkProps) {
   return (
     <Link
       data-current={isActive}
-      className="flex items-center gap-1.5 text-xl font-medium text-muted-foreground hover:text-foreground data-[current=true]:text-foreground"
+      className={twMerge(
+        "flex items-center gap-1.5 text-xl font-semibold text-muted hover:text-[#a943fc] data-[current=true]:text-primary",
+        className
+      )}
       {...props}
     />
   );

@@ -1,4 +1,11 @@
-import { UserPen, ChevronDown, LogOut, LogIn } from "lucide-react";
+import {
+  UserPen,
+  ChevronDown,
+  LogOut,
+  LogIn,
+  GraduationCap,
+  Book,
+} from "lucide-react";
 import { useNavigate } from "react-router";
 
 import { Button } from "./ui/button";
@@ -26,7 +33,7 @@ export function AccountMenu() {
   const queryClient = useQueryClient();
 
   const { data: profile, isLoading: isLoadingProfile } = useProfile();
-  const { authType } = useAuthStore();
+  const { authType, userId } = useAuthStore();
   const { isLoggedIn, isLoadingAuthentication, logoutProfile } =
     useAuthentication();
 
@@ -38,6 +45,14 @@ export function AccountMenu() {
 
   const [isProfileDialogOpen, setIsProfileDialogOpen] = useState(false);
 
+  async function handleCloseProfileModal() {
+    await queryClient.invalidateQueries({
+      queryKey: ["profile", userId],
+    });
+
+    setIsProfileDialogOpen(false);
+  }
+
   if (isLoadingAuthentication) {
     return <Skeleton className="h-4 w-40" />;
   }
@@ -46,17 +61,24 @@ export function AccountMenu() {
     return (
       <>
         <DropdownMenu modal={false}>
-          <DropdownMenuTrigger asChild>
+          <DropdownMenuTrigger asChild className="hover:bg-primary">
             <Button
               variant="outline"
-              className="flex select-none items-center gap-2"
+              className="flex select-none items-center gap-2 text-primary border-primary"
             >
               {isLoadingProfile ? (
                 <Skeleton className="h-4 w-40" />
               ) : (
-                <> Olá {profile?.name}!</>
+                <>
+                  {profile?.userType === "Teacher" ? (
+                    <GraduationCap className="size-4" />
+                  ) : (
+                    <Book className="size-4" />
+                  )}
+                  Olá {profile?.name}!
+                </>
               )}
-              <ChevronDown className="h-4 w-4" />
+              <ChevronDown className="size-4" />
             </Button>
           </DropdownMenuTrigger>
 
@@ -106,14 +128,14 @@ export function AccountMenu() {
         >
           {profile && authType === "Student" && (
             <StudentProfileDialog
-              onClose={() => setIsProfileDialogOpen(false)}
+              onClose={handleCloseProfileModal}
               profile={profile}
             />
           )}
 
           {profile && authType === "Teacher" && (
             <TeacherProfileDialog
-              onClose={() => setIsProfileDialogOpen(false)}
+              onClose={handleCloseProfileModal}
               profile={profile as TTeacher}
             />
           )}

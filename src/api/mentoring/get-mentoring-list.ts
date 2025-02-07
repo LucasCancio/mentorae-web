@@ -56,11 +56,14 @@ export function transformToMentoring(response: MentoringResponse): TMentoring {
     teacher: {
       id: response.teacher.teacher_id,
       email: response.teacher.user_account.email,
+      phone: response.teacher.phone,
       name: response.teacher.user_account.name,
       password: response.teacher.user_account.password,
       userId: response.teacher.user_account.user_id,
       isMentored: response.teacher.is_mentored,
       userType: response.teacher.user_account.user_type as UserType,
+      bio: response.teacher.bio,
+      personalId: response.teacher.personal_id,
     },
   };
 }

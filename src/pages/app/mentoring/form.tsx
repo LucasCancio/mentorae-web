@@ -62,14 +62,16 @@ export function MentoringForm() {
     formState: { isSubmitting, errors },
   } = useForm<TCreateMentoringSchema>({
     resolver: zodResolver(createMentoringSchema),
-    defaultValues: {
-      modality: mentoring?.modality ?? modalities[0],
-      matter: mentoring?.matter ?? undefined,
-      date:
-        mentoring?.mentoringDate == null
-          ? new Date()
-          : parseISO(mentoring.mentoringDate),
-    },
+    values: isEdditing
+      ? {
+          modality: mentoring?.modality ?? modalities[0],
+          matter: mentoring?.matter ?? "",
+          date:
+            mentoring?.mentoringDate == null
+              ? new Date()
+              : parseISO(mentoring.mentoringDate),
+        }
+      : undefined,
   });
 
   const { mutateAsync: updateOrRegisterMentoringFn } = useMutation({
@@ -131,35 +133,57 @@ export function MentoringForm() {
             onSubmit={handleSubmit(handleSaveMentoring)}
             className="flex flex-col gap-4 w-full flex-1"
           >
-            <div className="space-y-2">
-              <Label htmlFor="modality">Modalidade</Label>
-              <Controller
-                control={control}
-                name="modality"
-                render={({ field }) => (
-                  <Select
-                    defaultValue={field.value}
-                    value={field.value}
-                    disabled={field.disabled}
-                    name={field.name}
-                    onValueChange={(value) => field.onChange(value)}
-                  >
-                    <SelectTrigger className="">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {modalities?.map((modality) => (
-                        <SelectItem key={modality} value={modality}>
-                          {modality}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+            <div className="grid grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <Label htmlFor="modality">Modalidade</Label>
+                <Controller
+                  control={control}
+                  name="modality"
+                  render={({ field }) => (
+                    <Select
+                      defaultValue={field.value}
+                      value={field.value}
+                      disabled={field.disabled}
+                      name={field.name}
+                      onValueChange={(value) => field.onChange(value)}
+                    >
+                      <SelectTrigger className="">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {modalities?.map((modality) => (
+                          <SelectItem key={modality} value={modality}>
+                            {modality}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                {errors.modality && (
+                  <span className="text-red-700">
+                    {errors.modality.message}
+                  </span>
                 )}
-              />
-              {errors.modality && (
-                <span className="text-red-700">{errors.modality.message}</span>
-              )}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="date">Data</Label>
+                <div>
+                  <Controller
+                    control={control}
+                    name="date"
+                    render={({ field }) => (
+                      <DatePicker
+                        defaultValue={field.value}
+                        onSelect={(value) => field.onChange(value)}
+                      />
+                    )}
+                  />
+                </div>
+                {errors.date && (
+                  <span className="text-red-700">{errors.date.message}</span>
+                )}
+              </div>
             </div>
 
             <div className="space-y-2">
@@ -173,23 +197,6 @@ export function MentoringForm() {
               />
               {errors.matter && (
                 <span className="text-red-700">{errors.matter.message}</span>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="date">Data</Label>
-              <Controller
-                control={control}
-                name="date"
-                render={({ field }) => (
-                  <DatePicker
-                    defaultValue={field.value}
-                    onSelect={(value) => field.onChange(value)}
-                  />
-                )}
-              />
-              {errors.date && (
-                <span className="text-red-700">{errors.date.message}</span>
               )}
             </div>
 

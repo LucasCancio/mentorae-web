@@ -46,10 +46,10 @@ export function AuthenticatedLayout() {
   }, [navigate, token]);
 
   return (
-    <div className="flex min-h-screen flex-col antialiased">
+    <div className="flex min-h-screen flex-col antialiased bg-background">
       <Header />
 
-      <div className="flex flex-1 flex-col gap-4 p-8 pt-6 max-w-[800px] w-full mx-auto shadow-xl">
+      <div className="mt-8 flex flex-1 flex-col gap-4 max-w-[800px] w-full mx-auto">
         <Outlet />
       </div>
     </div>

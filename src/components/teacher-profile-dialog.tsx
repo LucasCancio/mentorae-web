@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { DialogTitle } from "@radix-ui/react-dialog";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -25,43 +25,12 @@ import {
 
 type Props = {
   profile: TTeacher;
-  onClose: () => void;
+  onClose: () => Promise<void>;
 };
 
 export function TeacherProfileDialog({ profile, onClose }: Props) {
-  const queryClient = useQueryClient();
-
   const { mutateAsync: updateProfileFn } = useMutation({
     mutationFn: updateTeacher,
-    onMutate({ name, email, is_mentored, personal_id, phone, bio }) {
-      const { cached } = updateProfileCache({
-        name,
-        email,
-        isMentored: is_mentored,
-        personalId: Number(personal_id) || 0,
-        phone: Number(phone) || 0,
-        bio,
-      });
-
-      return {
-        previousProfile: cached,
-      };
-    },
-    onError(_, __, context) {
-      if (context?.previousProfile) {
-        const { name, email, isMentored, personalId, phone, bio } =
-          context.previousProfile;
-
-        updateProfileCache({
-          name,
-          email,
-          isMentored,
-          personalId: Number(personalId) || 0,
-          phone: Number(phone) || 0,
-          bio,
-        });
-      }
-    },
   });
 
   const {
@@ -87,31 +56,6 @@ export function TeacherProfileDialog({ profile, onClose }: Props) {
   const staySamePassword = watch("staySamePassword");
   const isMentored = watch("isMentored");
 
-  function updateProfileCache({
-    email,
-    name,
-    isMentored,
-    personalId,
-    phone,
-    bio,
-  }: TUpdateTeacherSchema) {
-    const cached = queryClient.getQueryData<TTeacher>(["profile"]);
-
-    if (cached) {
-      queryClient.setQueryData<TTeacher>(["profile"], {
-        ...cached,
-        name,
-        email,
-        isMentored,
-        personalId: personalId.toString(),
-        phone: phone.toString(),
-        bio,
-      });
-    }
-
-    return { cached };
-  }
-
   async function handleUpdateProfile(data: TUpdateTeacherSchema) {
     try {
       await updateProfileFn({
@@ -126,17 +70,16 @@ export function TeacherProfileDialog({ profile, onClose }: Props) {
       });
 
       toast.success("Perfil atualizado com sucesso");
-      handleClose();
+      await handleClose();
     } catch (error) {
       console.error(error);
-
       toast.error("Falha ao atualizar o perfil, tente novamente!");
     }
   }
 
-  function handleClose() {
+  async function handleClose() {
+    await onClose();
     reset();
-    onClose();
   }
 
   return (
@@ -180,7 +123,9 @@ export function TeacherProfileDialog({ profile, onClose }: Props) {
               {...register("personalId")}
             />
             {errors.personalId && (
-              <span className="text-red-700">{errors.personalId.message}</span>
+              <span className="text-red-700 col-start-2 col-span-2">
+                {errors.personalId.message}
+              </span>
             )}
           </div>
 
@@ -250,7 +195,9 @@ export function TeacherProfileDialog({ profile, onClose }: Props) {
                 placeholder="Fale um pouco sobre você..."
               />
               {errors.bio && (
-                <span className="text-red-700">{errors.bio.message}</span>
+                <span className="text-red-700 col-start-2 col-span-2">
+                  {errors.bio.message}
+                </span>
               )}
             </div>
           )}

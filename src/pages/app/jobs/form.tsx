@@ -33,6 +33,7 @@ import {
 } from "@/components/ui/select";
 import { getJobById } from "@/api/jobs/get-job-by-id";
 import { updateOrRegisterJob } from "@/api/jobs/update-or-register-job";
+import { capitalize } from "lodash";
 
 const modalities = ["Home Office", "Presencial", "Híbrido"];
 const jobTypes = ["Estágio", "Júnior", "Pleno", "Sênior", "Especialista"];
@@ -70,19 +71,21 @@ export function JobForm() {
     formState: { isSubmitting, errors },
   } = useForm<TCreateJobSchema>({
     resolver: zodResolver(createJobSchema),
-    defaultValues: {
-      title: job?.title ?? undefined,
-      modality: job?.modality ?? modalities[0],
-      company: job?.company ?? undefined,
-      jobType: job?.jobType ?? jobTypes[0],
-      link: job?.link ?? undefined,
-      quantity: job?.quantity ?? 1,
-      urlImage: job?.urlImage ?? undefined,
-      publicationDate:
-        job?.publicationDate == null
-          ? new Date()
-          : parseISO(job.publicationDate),
-    },
+    values: isEdditing
+      ? {
+          title: job?.title ?? "",
+          modality: job?.modality ?? modalities[0],
+          company: job?.company ?? "",
+          jobType: job?.jobType ?? jobTypes[0],
+          link: job?.link ?? "",
+          quantity: job?.quantity ?? 1,
+          urlImage: job?.urlImage ?? "",
+          publicationDate:
+            job?.publicationDate == null
+              ? new Date()
+              : parseISO(job.publicationDate),
+        }
+      : undefined,
   });
 
   const urlImage = watch("urlImage");
@@ -91,16 +94,16 @@ export function JobForm() {
     mutationFn: updateOrRegisterJob,
   });
 
-  async function handleSaveMentoring(data: TCreateJobSchema) {
+  async function handleSaveJob(data: TCreateJobSchema) {
     try {
       const result = await updateOrRegisterJobFn({
         jobId,
-        company: data.company,
+        company: capitalize(data.company),
         job_type: data.jobType,
         link: data.link,
         publication_date: data.publicationDate.toISOString(),
         quantity: data.quantity,
-        title: data.title,
+        title: capitalize(data.title),
         url_image: data.urlImage,
         modality: data.modality,
         teacher_id: userId,
@@ -146,85 +149,129 @@ export function JobForm() {
           </div>
         ) : (
           <form
-            onSubmit={handleSubmit(handleSaveMentoring)}
+            onSubmit={handleSubmit(handleSaveJob)}
             className="flex flex-col gap-4 w-full flex-1"
           >
-            <div className="space-y-2">
-              <Label htmlFor="title">Título</Label>
-              <Input id="title" type="text" {...register("title")} />
-              {errors.title && (
-                <span className="text-red-700">{errors.title.message}</span>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="company">Empresa</Label>
-              <Input id="company" type="text" {...register("company")} />
-              {errors.company && (
-                <span className="text-red-700">{errors.company.message}</span>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="jobType">Tipo de vaga</Label>
-              <Controller
-                control={control}
-                name="jobType"
-                render={({ field }) => (
-                  <Select
-                    defaultValue={field.value}
-                    value={field.value}
-                    disabled={field.disabled}
-                    name={field.name}
-                    onValueChange={(value) => field.onChange(value)}
-                  >
-                    <SelectTrigger className="">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {jobTypes?.map((jobType) => (
-                        <SelectItem key={jobType} value={jobType}>
-                          {jobType}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+            <div className="grid grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <Label htmlFor="title">Título</Label>
+                <Input id="title" type="text" {...register("title")} />
+                {errors.title && (
+                  <span className="text-red-700">{errors.title.message}</span>
                 )}
-              />
-              {errors.jobType && (
-                <span className="text-red-700">{errors.jobType.message}</span>
-              )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="company">Empresa</Label>
+                <Input id="company" type="text" {...register("company")} />
+                {errors.company && (
+                  <span className="text-red-700">{errors.company.message}</span>
+                )}
+              </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="modality">Modalidade</Label>
-              <Controller
-                control={control}
-                name="modality"
-                render={({ field }) => (
-                  <Select
-                    defaultValue={field.value}
-                    value={field.value}
-                    disabled={field.disabled}
-                    name={field.name}
-                    onValueChange={(value) => field.onChange(value)}
-                  >
-                    <SelectTrigger className="">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {modalities?.map((modality) => (
-                        <SelectItem key={modality} value={modality}>
-                          {modality}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+            <div className="grid grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <Label htmlFor="jobType">Tipo de vaga</Label>
+                <Controller
+                  control={control}
+                  name="jobType"
+                  render={({ field }) => (
+                    <Select
+                      defaultValue={field.value}
+                      value={field.value}
+                      disabled={field.disabled}
+                      name={field.name}
+                      onValueChange={(value) => field.onChange(value)}
+                    >
+                      <SelectTrigger className="">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {jobTypes?.map((jobType) => (
+                          <SelectItem key={jobType} value={jobType}>
+                            {jobType}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                {errors.jobType && (
+                  <span className="text-red-700">{errors.jobType.message}</span>
                 )}
-              />
-              {errors.modality && (
-                <span className="text-red-700">{errors.modality.message}</span>
-              )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="modality">Modalidade</Label>
+                <Controller
+                  control={control}
+                  name="modality"
+                  render={({ field }) => (
+                    <Select
+                      defaultValue={field.value}
+                      value={field.value}
+                      disabled={field.disabled}
+                      name={field.name}
+                      onValueChange={(value) => field.onChange(value)}
+                    >
+                      <SelectTrigger className="">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {modalities?.map((modality) => (
+                          <SelectItem key={modality} value={modality}>
+                            {modality}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                {errors.modality && (
+                  <span className="text-red-700">
+                    {errors.modality.message}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <Label htmlFor="quantity">Quantidade de vagas</Label>
+                <Input
+                  id="quantity"
+                  min={1}
+                  type="number"
+                  {...register("quantity")}
+                />
+                {errors.quantity && (
+                  <span className="text-red-700">
+                    {errors.quantity.message}
+                  </span>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="publicationDate">Data de publicação</Label>
+                <div>
+                  <Controller
+                    control={control}
+                    name="publicationDate"
+                    render={({ field }) => (
+                      <DatePicker
+                        defaultValue={field.value}
+                        onSelect={(value) => field.onChange(value)}
+                      />
+                    )}
+                  />
+                </div>
+                {errors.publicationDate && (
+                  <span className="text-red-700">
+                    {errors.publicationDate.message}
+                  </span>
+                )}
+              </div>
             </div>
 
             <div className="space-y-2">
@@ -236,53 +283,23 @@ export function JobForm() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="urlImage">Imagem da vaga (url)</Label>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="urlImage">Imagem da vaga (url)</Label>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button
+                      variant="outline"
+                      disabled={urlImage?.length === 0 || !!errors?.urlImage}
+                    >
+                      <Image className="size-4 mr-2" /> Prévia da imagem
+                    </Button>
+                  </DialogTrigger>
+                  <ImagePreviewDialog imageUrl={urlImage} />
+                </Dialog>
+              </div>
               <Input id="urlImage" type="url" {...register("urlImage")} />
               {errors.urlImage && (
                 <span className="text-red-700">{errors.urlImage.message}</span>
-              )}
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button
-                    variant="outline"
-                    disabled={urlImage?.length === 0 || !!errors?.urlImage}
-                  >
-                    <Image className="size-4 mr-2" /> Prévia da imagem
-                  </Button>
-                </DialogTrigger>
-                <ImagePreviewDialog imageUrl={urlImage} />
-              </Dialog>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="quantity">Quantidade de vagas</Label>
-              <Input
-                id="quantity"
-                min={1}
-                type="number"
-                {...register("quantity")}
-              />
-              {errors.quantity && (
-                <span className="text-red-700">{errors.quantity.message}</span>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="publicationDate">Data de publicação</Label>
-              <Controller
-                control={control}
-                name="publicationDate"
-                render={({ field }) => (
-                  <DatePicker
-                    defaultValue={field.value}
-                    onSelect={(value) => field.onChange(value)}
-                  />
-                )}
-              />
-              {errors.publicationDate && (
-                <span className="text-red-700">
-                  {errors.publicationDate.message}
-                </span>
               )}
             </div>
 

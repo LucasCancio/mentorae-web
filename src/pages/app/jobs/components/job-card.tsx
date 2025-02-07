@@ -1,16 +1,24 @@
-import { format } from "date-fns";
+import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { capitalize } from "lodash";
 import { TJob } from "@/models/Job.model";
 import { deleteJob } from "@/api/jobs/delete-job";
-import { useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate } from "react-router";
 import { useAuthentication } from "@/contexts/authentication-context";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { SquareArrowOutUpRight } from "lucide-react";
+import { EllipsisVertical, Pencil, SquareArrowOutUpRight } from "lucide-react";
 import { ExcludeConfirmationDialog } from "@/components/exclude-confirmation-dialog";
 import { useState } from "react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 type Props = {
   job: TJob;
@@ -26,53 +34,112 @@ export function JobCard({ job }: Props) {
 
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
+  const { mutateAsync: deleteJobFn } = useMutation({
+    mutationFn: deleteJob,
+  });
+
   async function handleDelete() {
-    await deleteJob({ jobId: job.id });
+    try {
+      await deleteJobFn({ jobId: job.id });
 
-    await Promise.all([
-      queryClient.invalidateQueries({ queryKey: ["jobs"] }),
-      queryClient.invalidateQueries({ queryKey: ["job", job.id] }),
-    ]);
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["jobs"] }),
+        queryClient.invalidateQueries({ queryKey: ["job", job.id] }),
+      ]);
 
-    toast.success("Vaga excluida com sucesso!");
+      toast.success("Vaga excluida com sucesso!");
+    } catch (error) {
+      toast.error("Ocorreu um erro ao excluir a vaga!");
+    }
     navigate("/jobs");
   }
 
   return (
-    <div className="rounded-md shadow-md min-h-[380px] w-[400px] border-[1px] bg-background text-foreground flex flex-col hover:transform hover:scale-105 transition-transform">
-      <div className="w-full h-[220px] bg-white rounded-t-sm">
+    <div className="rounded-md relative shadow-lg w-[380px] h-[314px] bg-card text-foreground flex flex-col py-6 px-8">
+      <div className="flex flex-row justify-start gap-3">
         <img
           src={job.urlImage ?? ""}
-          alt={job.title}
-          className="size-full object-cover rounded-t-sm"
+          alt={job.company}
+          title={job.company}
+          className="size-20 object-cover rounded-t-sm"
         />
-      </div>
-      <div className="p-4 flex flex-1 flex-col">
-        <div className="flex-1 flex flex-col gap-2">
-          <h2 className="text-xl font-semibold flex-1 truncate">{job.title}</h2>
+        <div className="flex flex-col justify-center">
+          <h2
+            className="text-foreground font-semibold line-clamp-2"
+            title={job.title}
+          >
+            {job.title}
+          </h2>
+          <p className="text-muted-foreground truncate" title={job.company}>
+            {job.company}
+          </p>
         </div>
-        <time>
-          {capitalize(
-            format(new Date(job.publicationDate), "eeee, dd LLLL yyyy", {
-              locale: ptBR,
-            })
-          )}
-        </time>
       </div>
+
+      <table className="my-auto text-sm">
+        <tbody>
+          <tr>
+            <td className="text-muted-foreground">Modalidade</td>
+            <td>{job.modality}</td>
+          </tr>
+          <tr>
+            <td className="text-muted-foreground">Tipo de vaga</td>
+            <td>{job.jobType}</td>
+          </tr>
+          <tr>
+            <td className="text-muted-foreground">Quantidade de vagas</td>
+            <td>{job.quantity}</td>
+          </tr>
+          <tr>
+            <td className="text-muted-foreground">Data de publicação</td>
+            <td>
+              <time>
+                {capitalize(
+                  formatDistanceToNow(job.publicationDate, {
+                    locale: ptBR,
+                    addSuffix: true,
+                  })
+                )}
+              </time>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <Button asChild>
+        <Link to={job.link} target="_blank">
+          <SquareArrowOutUpRight className="mr-4" /> Se candidatar
+        </Link>
+      </Button>
+
       {isAuthor && (
-        <div className="flex gap-4">
-          <Button asChild>
-            <Link to={`/job-form?id=${job.id}`}>
-              <SquareArrowOutUpRight /> Editar
-            </Link>
-          </Button>
-          <ExcludeConfirmationDialog
-            isDeleteDialogOpen={isDeleteDialogOpen}
-            setIsDeleteDialogOpen={setIsDeleteDialogOpen}
-            onYesClick={handleDelete}
-            isDeleting={false}
-          />
-        </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              className="absolute top-2 right-2 size-7 p-1"
+            >
+              <EllipsisVertical />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-10">
+            <DropdownMenuLabel>Ações</DropdownMenuLabel>
+            <DropdownMenuGroup>
+              <DropdownMenuItem asChild className="cursor-pointer">
+                <Link to={`/job-form?id=${job.id}`}>
+                  <Pencil className="mr-2 size-4" /> Editar
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                <ExcludeConfirmationDialog
+                  isDeleteDialogOpen={isDeleteDialogOpen}
+                  setIsDeleteDialogOpen={setIsDeleteDialogOpen}
+                  onYesClick={handleDelete}
+                />
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
       )}
     </div>
   );
