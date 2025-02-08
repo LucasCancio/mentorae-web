@@ -38,7 +38,7 @@ export function Jobs() {
 
   return (
     <>
-      <Helmet title="Posts" />
+      <Helmet title="Vagas" />
 
       <div className="flex flex-col mt-2 flex-1 w-full mx-auto">
         {isTeacher && (
